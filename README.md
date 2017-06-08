@@ -1,2 +1,2 @@
 # Linux-Kernel-Sandbox
-Prepare this repo for cv.
+Linux kernel study plan.
