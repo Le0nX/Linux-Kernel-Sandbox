@@ -1,0 +1,131 @@
+From af15579845fa362575b3ddeb49f5e7f8957bc9d8 Mon Sep 17 00:00:00 2001
+From: Le0nX <cloudmindone@gmail.com>
+Date: Wed, 14 Jun 2017 21:12:26 +0000
+Subject: [PATCH 2/3] [PATCH] my_syscall2
+
+---
+ log.txt                   |   39 +++++++++++++++++++++++++++++++++++++++
+ my_syscalls/Makefile      |    3 ++-
+ my_syscalls/my_syscall.c  |    3 ++-
+ my_syscalls/my_syscall2.c |   41 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 84 insertions(+), 2 deletions(-)
+ create mode 100644 log.txt
+ create mode 100644 my_syscalls/my_syscall2.c
+
+diff --git a/log.txt b/log.txt
+new file mode 100644
+index 0000000..5bb95e9
+--- /dev/null
++++ b/log.txt
+@@ -0,0 +1,39 @@
++  CHK     include/config/kernel.release
++  CHK     include/generated/uapi/linux/version.h
++  CHK     include/generated/utsrelease.h
++  CALL    scripts/checksyscalls.sh
++  CHK     include/generated/compile.h
++  CC      my_syscalls/my_syscall2.o
++  LD      my_syscalls/built-in.o
++  LINK    vmlinux
++  LD      vmlinux.o
++  MODPOST vmlinux.o
++  GEN     .version
++  CHK     include/generated/compile.h
++  UPD     include/generated/compile.h
++  CC      init/version.o
++  LD      init/built-in.o
++  KSYM    .tmp_kallsyms1.o
++  KSYM    .tmp_kallsyms2.o
++  LD      vmlinux
++  SORTEX  vmlinux
++  SYSMAP  System.map
++  VOFFSET arch/x86/boot/voffset.h
++  OBJCOPY arch/x86/boot/compressed/vmlinux.bin
++  GZIP    arch/x86/boot/compressed/vmlinux.bin.gz
++  MKPIGGY arch/x86/boot/compressed/piggy.S
++  AS      arch/x86/boot/compressed/piggy.o
++  LD      arch/x86/boot/compressed/vmlinux
++  ZOFFSET arch/x86/boot/zoffset.h
++  AS      arch/x86/boot/header.o
++  CC      arch/x86/boot/version.o
++  LD      arch/x86/boot/setup.elf
++  OBJCOPY arch/x86/boot/setup.bin
++  OBJCOPY arch/x86/boot/vmlinux.bin
++  BUILD   arch/x86/boot/bzImage
++Setup is 15772 bytes (padded to 15872 bytes).
++System is 5857 kB
++CRC 4d550f9e
++Kernel: arch/x86/boot/bzImage is ready  (#12)
++  Building modules, stage 2.
++  MODPOST 17 modules
+diff --git a/my_syscalls/Makefile b/my_syscalls/Makefile
+index 8903942..ffd0214 100644
+--- a/my_syscalls/Makefile
++++ b/my_syscalls/Makefile
+@@ -1 +1,2 @@
+-obj-y := my_syscall.o
++obj-y += my_syscall.o
++obj-y += my_syscall2.o
+diff --git a/my_syscalls/my_syscall.c b/my_syscalls/my_syscall.c
+index 376bfae..48b9c7d 100644
+--- a/my_syscalls/my_syscall.c
++++ b/my_syscalls/my_syscall.c
+@@ -6,7 +6,8 @@ SYSCALL_DEFINE2 (my_syscall,
+ 		 int, x,
+ 		 int, y)
+ {
+-	long res = x + y;
++	int res;
++	res = x + y;
+ 	printk(KERN_INFO "MY_SYSCALL RETURNED: ", res);
+ 	return res;	
+ }
+diff --git a/my_syscalls/my_syscall2.c b/my_syscalls/my_syscall2.c
+new file mode 100644
+index 0000000..9e4af9d
+--- /dev/null
++++ b/my_syscalls/my_syscall2.c
+@@ -0,0 +1,41 @@
++#include <linux/syscalls.h>
++#include <linux/string.h>
++
++SYSCALL_DEFINE1 (my_syscall2,
++		 char*, buf)
++{
++	int 		counter = 0;
++	char 		*buffy;
++	size_t len = 	strlen(buf);
++	
++	printk(KERN_INFO "Entered into my_syscall2\n");
++	if (copy_from_user(buffy, buf, len))
++		return -EFAULT;	
++
++	if (len > 128){
++		
++		printk(KERN_ERR "mysyscall2 too long string");
++		return -1;
++	
++	} else {
++		printk(KERN_INFO "Passed len_check\n");
++		while(*(buffy++)){
++			
++			if (*buffy == 'o' || *buffy == 'O'){
++				*buffy = '0';
++				counter++; 
++			}
++			
++		}
++		
++		if (copy_to_user(buf, buffy,len))
++			return -EFAULT;
++		
++		printk(KERN_INFO "Returning result... ");
++		return counter;
++	}
++
++	
++	printk(KERN_ERR "ERROR: something went wrong!");
++}
++ 
+-- 
+1.7.10.4
+

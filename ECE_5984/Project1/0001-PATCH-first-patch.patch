@@ -1,0 +1,98 @@
+From 17bab1a8c35bf9a1d6cded16dc30a9f43dcfbb05 Mon Sep 17 00:00:00 2001
+From: Le0nX <cloudmindone@gmail.com>
+Date: Tue, 13 Jun 2017 20:38:46 +0000
+Subject: [PATCH 1/3] [PATCH] first patch
+
+---
+ Makefile                         |    2 +-
+ arch/x86/syscalls/syscall_64.tbl |    3 ++-
+ include/linux/syscalls.h         |    3 ++-
+ init/main.c                      |    2 ++
+ my_syscalls/Makefile             |    1 +
+ my_syscalls/my_syscall.c         |   14 ++++++++++++++
+ 6 files changed, 22 insertions(+), 3 deletions(-)
+ create mode 100644 my_syscalls/Makefile
+ create mode 100644 my_syscalls/my_syscall.c
+
+diff --git a/Makefile b/Makefile
+index fbd43bf..abdf2ce 100644
+--- a/Makefile
++++ b/Makefile
+@@ -884,7 +884,7 @@ export mod_sign_cmd
+ 
+ 
+ ifeq ($(KBUILD_EXTMOD),)
+-core-y		+= kernel/ mm/ fs/ ipc/ security/ crypto/ block/
++core-y		+= kernel/ mm/ fs/ ipc/ security/ crypto/ block/ my_syscalls/
+ 
+ vmlinux-dirs	:= $(patsubst %/,%,$(filter %/, $(init-y) $(init-m) \
+ 		     $(core-y) $(core-m) $(drivers-y) $(drivers-m) \
+diff --git a/arch/x86/syscalls/syscall_64.tbl b/arch/x86/syscalls/syscall_64.tbl
+index 8d656fb..6c4934f 100644
+--- a/arch/x86/syscalls/syscall_64.tbl
++++ b/arch/x86/syscalls/syscall_64.tbl
+@@ -329,7 +329,8 @@
+ 320	common	kexec_file_load		sys_kexec_file_load
+ 321	common	bpf			sys_bpf
+ 322	64	execveat		stub_execveat
+-
++333	common	my_syscall		sys_my_syscall
++334	common	my_syscall2		sys_my_syscall2
+ #
+ # x32-specific system call numbers start at 512 to avoid cache impact
+ # for native 64-bit operation.
+diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+index 76d1e38..bc03724 100644
+--- a/include/linux/syscalls.h
++++ b/include/linux/syscalls.h
+@@ -883,5 +883,6 @@ asmlinkage long sys_bpf(int cmd, union bpf_attr *attr, unsigned int size);
+ asmlinkage long sys_execveat(int dfd, const char __user *filename,
+ 			const char __user *const __user *argv,
+ 			const char __user *const __user *envp, int flags);
+-
++asmlinkage long sys_my_syscall(int x, int y);
++asmlinkage long sys_my_syscall2(char *buf);
+ #endif
+diff --git a/init/main.c b/init/main.c
+index 6f0f1c5f..5292478 100644
+--- a/init/main.c
++++ b/init/main.c
+@@ -505,6 +505,8 @@ asmlinkage __visible void __init start_kernel(void)
+ 	 */
+ 	boot_init_stack_canary();
+ 
++	printk(KERN_INFO "LOOOOOOOOOOOOOOL KERNEL HACK!!!");	
++	
+ 	cgroup_init_early();
+ 
+ 	local_irq_disable();
+diff --git a/my_syscalls/Makefile b/my_syscalls/Makefile
+new file mode 100644
+index 0000000..8903942
+--- /dev/null
++++ b/my_syscalls/Makefile
+@@ -0,0 +1 @@
++obj-y := my_syscall.o
+diff --git a/my_syscalls/my_syscall.c b/my_syscalls/my_syscall.c
+new file mode 100644
+index 0000000..376bfae
+--- /dev/null
++++ b/my_syscalls/my_syscall.c
+@@ -0,0 +1,14 @@
++#include <linux/syscalls.h>
++#include <linux/string.h>
++#include <linux/uaccess.h>
++
++SYSCALL_DEFINE2 (my_syscall,
++		 int, x,
++		 int, y)
++{
++	long res = x + y;
++	printk(KERN_INFO "MY_SYSCALL RETURNED: ", res);
++	return res;	
++}
++
++
+-- 
+1.7.10.4
+
