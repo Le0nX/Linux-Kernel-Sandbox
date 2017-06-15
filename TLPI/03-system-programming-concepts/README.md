@@ -13,7 +13,7 @@ What is the significance of these numbers? (Converting them to hexadecimal provi
 Theese numbers look more interesting in hex:
 
 672274793 = 0x28121969
- 85072278 = 0x05121996
+85072278 = 0x05121996
 369367448 = 0x16041998
 537993216 = 0x20112000
 
