@@ -7,11 +7,13 @@
 
 int main(){
 	
-	printf("CALLING MY_SYSCALL...RETURNED VALUE: %d", syscall(__NR_my_syscall,45,45));
+	printf("CALLING MY_SYSCALL...RETURNED VALUE: %d\n", syscall(__NR_my_syscall,45,45));
 	
-	char string[] = "Rodrigo sucks! oHoHoH";
-  	int x =	syscall(__NR_my_syscall2,string);	
+	char string_bad[] = "safkjas;lkdfj;laskdjf;laskjfksdfsdafasdfasdfasfasd fasdfsafasdf asdf asdfa sdf assdfasd fasdfasdfsafasdfasdfasdfasfdkasjfkljasdfaksldajdjfa;klsdfasjdhf";
+	char string_good[] = "Rodrigo Sucks, oHoHoHo!";
+
+	printf("CALLING MY_SYSCALL2...RETURNED VALUE: %d\n", syscall(__NR_my_syscall2,string_good)); 
+	printf("CALLING MY_SYSCALL2...RETURNED VALUE: %d\n", syscall(__NR_my_syscall2,string_bad)); 
 	
-	printf("%d", x);
 	return 0;
 }
