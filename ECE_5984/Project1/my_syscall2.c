@@ -1,20 +1,25 @@
 #include <linux/syscalls.h>
 #include <linux/string.h>
+#include <linux/slab.h>
 
 SYSCALL_DEFINE1 (my_syscall2,
 		 char*, buf)
 {
 	int 		counter = 0;
-	char 		*buffy;
-	size_t len = 	strlen(buf);
+	size_t 		len = strlen(buf);
+	char 		*buffy = (char*)kmalloc((sizeof(char) * len + 1), GFP_KERNEL);
+
 	
 	printk(KERN_INFO "Entered into my_syscall2\n");
-	if (copy_from_user(buffy, buf, len))
+	if (copy_from_user(buffy, buf, len)){
+		kree(buffy);
 		return -EFAULT;	
+	}
 
 	if (len > 128){
 		
-		printk(KERN_ERR "mysyscall2 too long string");
+		printk(KERN_ERR "mysyscall2 too long string\n");
+		kfree(buffy);
 		return -1;
 	
 	} else {
@@ -28,10 +33,13 @@ SYSCALL_DEFINE1 (my_syscall2,
 			
 		}
 		
-		if (copy_to_user(buf, buffy,len))
+		if (copy_to_user(buf, buffy,len)){
+			kfree(buffy);
 			return -EFAULT;
-		
-		printk(KERN_INFO "Returning result... ");
+		}
+
+		printk(KERN_INFO "Returning result...\n");
+		kfree(buffy);
 		return counter;
 	}
 
