@@ -2,6 +2,8 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/list.h>
+#include <linux/random.h>
+
 
 static int dstruct_size = -1;  // initial var
 module_param(dstruct_size, int, 0644);
@@ -25,15 +27,16 @@ static int __init module_start(void)
 {
 	printk(KERN_ALERT "TEEEEST\n");
 	printk(KERN_INFO ">>> Project2: module was loaded\n");
-	printk(KERN_INFO ">>> ["\d"] arguments were passed\n", dstruct_size);
+	printk(KERN_INFO ">>> ["%d"] arguments were passed\n", dstruct_size);
 	
 	if (dstruct_size < 0){
 		
 		printk(KERN_ALERT "Invalid argument\n");
-		return -1;
+		return -EPERM;
 		
 	}
 	
+	constructA(dstruct_size);
 	
 	
 	
@@ -49,6 +52,21 @@ static void __exit exit_module(void)
 
 }
 
+
+static void constructA(int size)
+{
+	struct just_list *mylistA;
+	int random, i;
+	
+	for (i=0; i<size; i++){
+		printk(KERN_INFO ">>> Entering the loop in constructA...\n");
+		
+		mylistA = kmalloc(sizeof(*mylistA), GFP_KERNEL);
+			 
+		get_random_bytes(&random, sizeof(int));
+	}
+	
+}
 
 
 
