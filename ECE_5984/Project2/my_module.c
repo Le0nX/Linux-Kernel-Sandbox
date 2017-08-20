@@ -22,6 +22,9 @@ struct just_list mylist;
  */
  
 static void constructA(int size);
+static void printB(void);
+static void destructC(void);
+static void all_in_oneABC(int size);
 
 static int __init module_start(void)
 {
