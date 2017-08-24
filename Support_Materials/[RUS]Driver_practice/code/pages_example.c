@@ -16,7 +16,7 @@ free_pages(pages, 3);
 
 
 
-/* create new block in cache */
+/* create new block(alloc pages) in cache */
 
 static void* kmem_get_pages(struct kmem_cache *cachep, gfp_t flags, int nodeid)
 {
